@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+    <title>Укротитель ссылок</title>
+  </head>
+  <body>
+    <div class="container mx-auto my-10">
+      <h1 class="my-12 text-3xl text-center">Укротитель ссылок</h1>
+      <form class="flex flex-col justify-between" id="add-link-form">
+        <input
+          type="text"
+          class="block w-full p-4 mb-5 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          name="originalUrl"
+          placeholder="Оригинальный URL"
+          required
+        />
+        <button
+          type="submit"
+          class="text-white bg-green-700 hover:bg-green-800 focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+        >
+          Укротить!
+        </button>
+      </form>
+      <input
+        type="text"
+        class="block w-full mt-5 p-4 mb-5 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        name="result"
+        id="result"
+        placeholder="Укрощенный URL"
+        required
+      />
+    </div>
+  </body>
+  <script>
+    function addLink(originalUrl) {
+      fetch("/api/links", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ originalUrl }),
+      })
+        .then((response) => {
+          console.log(response);
+          return response.json();
+        })
+        .then((data) => {
+          showResult(`${window.location.origin}/${data.shortUrl}`);
+        })
+        .catch((error) => {
+          showResult("Что-то пошло не так...");
+          console.error(error);
+        });
+    }
+
+    function showResult(message) {
+      const resultInput = document.getElementById("result");
+      resultInput.value = message;
+    }
+
+    const form = document.getElementById("add-link-form");
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const originalUrl = event.target.originalUrl.value;
+      addLink(originalUrl);
+    });
+  </script>
+</html>
